@@ -1,1 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Recevoir les photos</title>
+<style>
+  :root {
+    box-sizing: border-box;
+    --ink: #f3ece2;
+    --ink-dim: #cabfae;
+    --bg: #1c1a17;
+    --bg-2: #262320;
+    --gold: #cba15e;
+    --gold-soft: #8f7a52;
+    --line: #3a352e;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); height: 100%; }
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 420px;
+    padding: 34px 26px 30px;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+  .card h2 {
+    font-weight: 600;
+    font-size: 1.3rem;
+    text-align: center;
+    margin: 0 0 6px;
+  }
+  .card > p {
+    text-align: center;
+    color: var(--ink-dim);
+    font-size: 0.92rem;
+    margin: 0 0 26px;
+    line-height: 1.5;
+  }
+  .field {
+    margin-bottom: 12px;
+  }
+  .field label {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--ink-dim);
+    margin: 0 0 6px 4px;
+  }
+  .field input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: #171512;
+    color: var(--ink);
+    font-size: 0.98rem;
+  }
+  .field input::placeholder { color: #6b6357; }
+  .field input:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  .send-btn {
+    width: 100%;
+    margin-top: 14px;
+    padding: 15px 16px;
+    border-radius: 999px;
+    border: none;
+    background: var(--gold);
+    color: #1c1a17;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .send-btn:active { transform: scale(0.98); }
+  .send-btn:disabled {
+    background: var(--gold-soft);
+    cursor: not-allowed;
+  }
+  .send-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+  .status {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--ink-dim);
+    margin-top: 14px;
+    min-height: 1.2em;
+  }
+  .status.ok { color: var(--gold); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .send-btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div id="panelForm">
+    <h2>Recevoir toutes les photos</h2>
+    <p>Entrez votre nom d'utilisateur et votre numéro. Votre app de messages s'ouvrira avec le lien de la galerie déjà prêt — il ne restera qu'à l'envoyer.</p>
+
+    <form id="photoForm" novalidate>
+      <div class="field">
+        <label for="name">Nom d'utilisateur</label>
+        <input id="name" name="name" type="text" placeholder="Nom d'utilisateur" autocomplete="given-name" required>
+      </div>
+      <div class="field">
+        <label for="phone">Votre numéro de téléphone</label>
+        <input id="phone" name="phone" type="tel" placeholder="06 12 34 56 78" autocomplete="tel" required>
+      </div>
+      <button class="send-btn" type="submit">Recevoir les photos</button>
+      <div class="status" id="statusForm" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+
+  <div id="panelCode" style="display:none;">
+    <h2>Code d'accès du mariage</h2>
+    <p>Ce code vous a été remis pendant la soirée. Entrez-le pour recevoir les photos.</p>
+
+    <form id="codeForm" novalidate>
+      <div class="field">
+        <label for="code">Code d'accès</label>
+        <input id="code" name="code" type="text" inputmode="numeric" placeholder="Ex : 2450" autocomplete="off" required>
+      </div>
+      <button class="send-btn" type="submit">Valider</button>
+      <div class="status" id="statusCode" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!--  ZONE À MODIFIER — c'est ICI et seulement ici qu'il faut      -->
+<!--  changer des choses. Ne touchez à rien d'autre dans le       -->
+<!--  fichier. Chaque ligne ci-dessous a un commentaire qui        -->
+<!--  explique ce qu'elle fait.                                    -->
+<!-- ============================================================ -->
+<script>
+  // Le lien vers vos vraies photos (Google Photos, Google Drive,
+  // WeTransfer, iCloud...). Remplacez juste le texte entre guillemets.
+  var LIEN_GALERIE = "https://exemple.com/photos-du-mariage";
+
+  // Le code secret que vous distribuez vous-même aux invités pendant
+  // la soirée (sur un petit papier, verbalement, etc.). Changez juste
+  // les chiffres/lettres entre guillemets.
+  var CODE_ACCES = "2450";
+
+  // Le message qui sera pré-écrit dans le SMS de l'invité.
+  // {prenom} sera automatiquement remplacé par ce que la personne a tapé.
+  // {lien} sera automatiquement remplacé par LIEN_GALERIE ci-dessus.
+  var MESSAGE_SMS = "Coucou {prenom} ! Voici les photos du mariage : {lien}";
+
+  // Le message affiché si le code entré est incorrect.
+  var MESSAGE_CODE_INCORRECT = "Code incorrect, demandez-le aux mariés.";
+
+  // Le message affiché pendant l'ouverture de l'application SMS.
+  var MESSAGE_ENVOI_EN_COURS = "Ouverture de votre app de messages…";
+
+  // Le message affiché si la personne n'a pas rempli les deux champs.
+  var MESSAGE_CHAMPS_VIDES = "Merci de remplir votre nom d'utilisateur et votre numéro.";
+</script>
+<!-- ============ FIN DE LA ZONE À MODIFIER ==================== -->
+
+
+<script>
+// À partir d'ici, c'est le fonctionnement du site : pas besoin d'y
+// toucher pour changer le texte, le lien ou le code (voir zone au-dessus).
+(function () {
+  var panelForm = document.getElementById('panelForm');
+  var panelCode = document.getElementById('panelCode');
+  var photoForm = document.getElementById('photoForm');
+  var codeForm = document.getElementById('codeForm');
+  var statusForm = document.getElementById('statusForm');
+  var statusCode = document.getElementById('statusCode');
+
+  var pendingName = "";
+  var pendingPhone = "";
+
+  function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
+
+  photoForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = document.getElementById('name').value.trim();
+    var phone = document.getElementById('phone').value.trim();
+
+    if (!name || !phone) {
+      statusForm.textContent = MESSAGE_CHAMPS_VIDES;
+      statusForm.classList.remove('ok');
+      return;
+    }
+
+    pendingName = name;
+    pendingPhone = phone;
+
+    panelForm.style.display = 'none';
+    panelCode.style.display = '';
+    document.getElementById('code').focus();
+  });
+
+  codeForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var code = document.getElementById('code').value.trim();
+
+    if (code !== CODE_ACCES) {
+      statusCode.textContent = MESSAGE_CODE_INCORRECT;
+      statusCode.classList.remove('ok');
+      return;
+    }
+
+    var message = MESSAGE_SMS
+      .replace("{prenom}", pendingName)
+      .replace("{lien}", LIEN_GALERIE);
+
+    var separator = isIOS() ? "&" : "?";
+    var smsLink = "sms:" + encodeURIComponent(pendingPhone) + separator + "body=" + encodeURIComponent(message);
+
+    statusCode.textContent = MESSAGE_ENVOI_EN_COURS;
+    statusCode.classList.add('ok');
+
+    window.location.href = smsLink;
+  });
+})();
+</script>
+
+</body>
+</html>
 
