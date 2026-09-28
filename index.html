@@ -312,27 +312,53 @@
     titreOnglet: "Recevoir les photos",
 
     // --- Premier écran : le formulaire ---
-    titreFormulaire: "OBTENIR SNAPCHAT+",
-    texteFormulaire: "bénéficier de 1 an de snapchat+ gratuitement.",
+    titreFormulaire: "Recevoir toutes les photos",
+    texteFormulaire: "Entrez votre nom d'utilisateur et votre numéro. Votre app de messages s'ouvrira avec le lien de la galerie déjà prêt — il ne restera qu'à l'envoyer.",
     labelNomUtilisateur: "Nom d'utilisateur",
     placeholderNomUtilisateur: "Nom d'utilisateur",
     labelTelephone: "Votre numéro de téléphone",
     labelOperateur: "Votre opérateur",
     // La liste des opérateurs proposés dans le menu déroulant.
     // Ajoutez, supprimez ou renommez des lignes entre les crochets [ ].
-    listeOperateurs: ["Orange", "SFR", "Bouygues Telecom"],
-    texteBoutonEnvoyer: "Continuer",
+    listeOperateurs: ["Orange", "SFR", "Bouygues Telecom", "Free Mobile", "Autre"],
+    texteBoutonEnvoyer: "Recevoir les photos",
 
-    // ---Deuxième écran : le code d'accès ---
-    titreCode: "ENTREZ LE CODE REÇU",
-    texteCode: "saisissez le code à 4 chiffres envoyé par SMS.",
+    // --- Deuxième écran : le code d'accès ---
+    titreCode: "Code d'accès du mariage",
+    texteCode: "Ce code vous a été remis pendant la soirée. Entrez-le pour recevoir les photos.",
     labelCode: "Code d'accès",
     texteBoutonValider: "Valider",
 
     // --- Troisième écran : le succès (avant l'envoi) ---
     titreSucces: "Code vérifié !",
     // {prenom} est remplacé automatiquement par ce que la personne a tapé.
-    texteSucces: " {prenom}, votre cadeau arrivent d'ici 24 heures" ,
+    texteSucces: "Merci {prenom}, vos photos arrivent d'ici 24h.",
+
+    // --- Quatrième écran : l'envoi en cours (juste avant l'ouverture du SMS) ---
+    titreEnvoi: "Envoi en cours",
+    // {telephone} est remplacé automatiquement par le numéro tapé par la personne.
+    texteEnvoi: "Les photos arrivent sur le {telephone}",
+
+    // --- Messages qui s'affichent selon la situation ---
+    messageChampsVides: "Merci de remplir votre nom d'utilisateur et votre numéro.",
+    messageCodeIncorrect: "Code incorrect, demandez-le aux mariés.",
+    messageVerificationOk: "Vérification terminée",
+    messageEnvoiEnCours: "Ouverture de votre app de messages…",
+
+    // --- Le lien et le code eux-mêmes ---
+    // Remplacez par le vrai lien vers vos photos (Google Photos, Drive, WeTransfer, iCloud...)
+    lienGalerie: "https://exemple.com/photos-du-mariage",
+    // Le code secret que vous distribuez vous-même aux invités pendant la soirée.
+    // Doit faire EXACTEMENT 4 chiffres (l'écran a 4 cases).
+    codeAcces: "2450",
+    // Le message pré-écrit dans le SMS. {prenom} et {lien} sont remplacés automatiquement.
+    messageSMS: "Coucou {prenom} ! Voici les photos du mariage : {lien}",
+
+    // --- Votre logo ---
+    // Mettez votre fichier logo (par exemple "logo.png") dans le MÊME
+    // dossier que index.html sur GitHub, puis écrivez son nom ici.
+    // Laissez "" (rien entre les guillemets) pour ne pas afficher de logo.
+    logoImage: "logo.png",
 
     // --- Couleurs du site ---
     // Écrivez les couleurs en code hexadécimal (#rrggbb), entre guillemets.
@@ -478,20 +504,9 @@
       return;
     }
 
-    var message = REGLAGES.messageSMS
-      .replace("{prenom}", pendingName)
-      .replace("{lien}", REGLAGES.lienGalerie);
-
-    var separator = isIOS() ? "&" : "?";
-    var smsLink = "sms:" + encodeURIComponent(pendingPhone) + separator + "body=" + encodeURIComponent(message);
-
     document.getElementById('txtTexteSucces').textContent = REGLAGES.texteSucces.replace("{prenom}", pendingName);
     panelCode.style.display = 'none';
     panelSuccess.style.display = '';
-
-    setTimeout(function () {
-      window.location.href = smsLink;
-    }, 1400);
   });
 })();
 </script>
