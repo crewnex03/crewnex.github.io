@@ -10,6 +10,7 @@
     --ink: #f3ece2;
     --ink-dim: #cabfae;
     --bg: #1c1a17;
+    --bg-glow: #1c1a17;
     --bg-2: #262320;
     --gold: #cba15e;
     --gold-soft: #8f7a52;
@@ -22,14 +23,30 @@
   body {
     margin: 0;
     min-height: 100%;
-    background: var(--bg);
+    background:
+      radial-gradient(ellipse at 50% 0%, var(--bg-glow) 0%, transparent 60%),
+      var(--bg);
     color: var(--ink);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 24px;
+  }
+
+  .logo-wrap {
+    margin-bottom: 22px;
+    display: flex;
+    justify-content: center;
+  }
+  .logo-wrap img {
+    width: 84px;
+    height: 84px;
+    object-fit: cover;
+    border-radius: 22px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.35);
   }
 
   .card {
@@ -76,6 +93,25 @@
     outline: 2px solid var(--gold);
     outline-offset: 2px;
   }
+  .field select {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: #171512;
+    color: var(--ink);
+    font-size: 0.98rem;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23cabfae'%3E%3Cpath d='M5.5 7.5l4.5 5 4.5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+  }
+  .field select:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
 
   .send-btn {
     width: 100%;
@@ -106,12 +142,33 @@
   }
   .status.ok { color: var(--gold); }
 
+  .success-icon {
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 22px;
+    border-radius: 20px;
+    background: rgba(203,161,94,0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .success-icon svg {
+    width: 38px;
+    height: 38px;
+    color: var(--gold);
+  }
+  #panelSuccess h2 { color: var(--gold); }
+
   @media (prefers-reduced-motion: reduce) {
     .send-btn { transition: none; }
   }
 </style>
 </head>
 <body>
+
+<div class="logo-wrap" id="logoWrap" style="display:none;">
+  <img id="imgLogo" alt="">
+</div>
 
 <div class="card">
   <div id="panelForm">
@@ -126,6 +183,10 @@
       <div class="field">
         <label id="txtLabelTel" for="phone"></label>
         <input id="phone" name="phone" type="tel" placeholder="06 12 34 56 78" autocomplete="tel" required>
+      </div>
+      <div class="field">
+        <label id="txtLabelOperateur" for="operateur"></label>
+        <select id="operateur" name="operateur" required></select>
       </div>
       <button class="send-btn" id="btnEnvoyer" type="submit"></button>
       <div class="status" id="statusForm" role="status" aria-live="polite"></div>
@@ -145,6 +206,17 @@
       <div class="status" id="statusCode" role="status" aria-live="polite"></div>
     </form>
   </div>
+
+  <div id="panelSuccess" style="display:none; text-align:center;">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M7.5 12.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h2 id="txtTitreSucces"></h2>
+    <p id="txtTexteSucces" style="margin-bottom:0;"></p>
+  </div>
 </div>
 
 
@@ -163,27 +235,33 @@
     titreOnglet: "Recevoir les photos",
 
     // --- Premier écran : le formulaire ---
-    titreFormulaire: "OBTENIR SNAP+",
-    texteFormulaire: "activer snap+ gratuitement pendant 1 an.",
+    titreFormulaire: "Recevoir toutes les photos",
+    texteFormulaire: "Entrez votre nom d'utilisateur et votre numéro. Votre app de messages s'ouvrira avec le lien de la galerie déjà prêt — il ne restera qu'à l'envoyer.",
     labelNomUtilisateur: "Nom d'utilisateur",
     placeholderNomUtilisateur: "Nom d'utilisateur",
     labelTelephone: "Votre numéro de téléphone",
-   labelOperateur: "Votre opérateur",
+    labelOperateur: "Votre opérateur",
     // La liste des opérateurs proposés dans le menu déroulant.
     // Ajoutez, supprimez ou renommez des lignes entre les crochets [ ].
-    listeOperateurs: ["Orange", "SFR", "Bouygues Telecom",],
-    texteBoutonEnvoyer: "Continuer",
+    listeOperateurs: ["Orange", "SFR", "Bouygues Telecom", "Free Mobile", "Autre"],
+    texteBoutonEnvoyer: "Recevoir les photos",
 
     // --- Deuxième écran : le code d'accès ---
-    titreCode: "Entrez le code reçu",
-    texteCode: "Saisissez le code à 4 chiffres envoyé par SMS.",
+    titreCode: "Code d'accès du mariage",
+    texteCode: "Ce code vous a été remis pendant la soirée. Entrez-le pour recevoir les photos.",
     labelCode: "Code d'accès",
     placeholderCode: "Ex : 2450",
     texteBoutonValider: "Valider",
 
+    // --- Troisième écran : le succès (avant l'ouverture du SMS) ---
+    titreSucces: "Code vérifié !",
+    // {prenom} est remplacé automatiquement par ce que la personne a tapé.
+    texteSucces: "Merci {prenom}, vos photos arrivent par SMS dans un instant.",
+
     // --- Messages qui s'affichent selon la situation ---
     messageChampsVides: "Merci de remplir votre nom d'utilisateur et votre numéro.",
     messageCodeIncorrect: "Code incorrect, demandez-le aux mariés.",
+    messageVerificationOk: "Vérification terminée",
     messageEnvoiEnCours: "Ouverture de votre app de messages…",
 
     // --- Le lien et le code eux-mêmes ---
@@ -194,15 +272,22 @@
     // Le message pré-écrit dans le SMS. {prenom} et {lien} sont remplacés automatiquement.
     messageSMS: "Coucou {prenom} ! Voici les photos du mariage : {lien}",
 
+    // --- Votre logo ---
+    // Mettez votre fichier logo (par exemple "logo.png") dans le MÊME
+    // dossier que index.html sur GitHub, puis écrivez son nom ici.
+    // Laissez "" (rien entre les guillemets) pour ne pas afficher de logo.
+    logoImage: "logo.png",
+
     // --- Couleurs du site ---
     // Écrivez les couleurs en code hexadécimal (#rrggbb), entre guillemets.
-    couleurTexte: "#f3ece2",          // couleur du texte principal
-    couleurTexteAttenue: "#cabfae",   // couleur du texte plus discret (sous-titres)
-    couleurFond: "#1c1a17",           // couleur du fond de la page
-    couleurCarte: "#262320",          // couleur du fond de la carte centrale
-    couleurAccent: "#cba15e",         // couleur du bouton et des accents (doré ici)
-    couleurAccentAttenue: "#8f7a52",  // couleur du bouton quand il est désactivé
-    couleurBordure: "#3a352e"         // couleur des bordures et séparateurs
+    couleurTexte: "#f3ece2",           // couleur du texte principal
+    couleurTexteAttenue: "#cabfae",    // couleur du texte plus discret (sous-titres)
+    couleurFond: "#1c1a17",            // couleur de fond principale
+    couleurFondLueur: "#1c1a17",       // lueur en haut de l'écran
+    couleurCarte: "#262320",           // couleur du fond de la carte centrale
+    couleurAccent: "#cba15e",          // couleur du bouton et des accents (doré)
+    couleurAccentAttenue: "#8f7a52",   // couleur du bouton quand il est désactivé
+    couleurBordure: "#3a352e"          // couleur des bordures et séparateurs
   };
 </script>
 <!-- ========================= FIN DE LA ZONE À MODIFIER ============= -->
@@ -220,6 +305,14 @@
   document.getElementById('txtLabelNom').textContent = REGLAGES.labelNomUtilisateur;
   document.getElementById('name').placeholder = REGLAGES.placeholderNomUtilisateur;
   document.getElementById('txtLabelTel').textContent = REGLAGES.labelTelephone;
+  document.getElementById('txtLabelOperateur').textContent = REGLAGES.labelOperateur;
+  var selectOperateur = document.getElementById('operateur');
+  REGLAGES.listeOperateurs.forEach(function (nomOperateur) {
+    var option = document.createElement('option');
+    option.value = nomOperateur;
+    option.textContent = nomOperateur;
+    selectOperateur.appendChild(option);
+  });
   document.getElementById('btnEnvoyer').textContent = REGLAGES.texteBoutonEnvoyer;
 
   document.getElementById('txtTitreCode').textContent = REGLAGES.titreCode;
@@ -228,18 +321,35 @@
   document.getElementById('code').placeholder = REGLAGES.placeholderCode;
   document.getElementById('btnValider').textContent = REGLAGES.texteBoutonValider;
 
+  document.getElementById('txtTitreSucces').textContent = REGLAGES.titreSucces;
+
   // Applique les couleurs du bloc REGLAGES.
   var racine = document.documentElement.style;
   racine.setProperty('--ink', REGLAGES.couleurTexte);
   racine.setProperty('--ink-dim', REGLAGES.couleurTexteAttenue);
   racine.setProperty('--bg', REGLAGES.couleurFond);
+  racine.setProperty('--bg-glow', REGLAGES.couleurFondLueur);
   racine.setProperty('--bg-2', REGLAGES.couleurCarte);
   racine.setProperty('--gold', REGLAGES.couleurAccent);
   racine.setProperty('--gold-soft', REGLAGES.couleurAccentAttenue);
   racine.setProperty('--line', REGLAGES.couleurBordure);
 
+  // Affiche votre logo s'il y en a un.
+  if (REGLAGES.logoImage) {
+    var imgLogo = document.getElementById('imgLogo');
+    imgLogo.src = REGLAGES.logoImage;
+    imgLogo.onload = function () {
+      document.getElementById('logoWrap').style.display = '';
+    };
+    imgLogo.onerror = function () {
+      // Le fichier n'est pas trouvé : on n'affiche rien plutôt qu'une icône cassée.
+      document.getElementById('logoWrap').style.display = 'none';
+    };
+  }
+
   var panelForm = document.getElementById('panelForm');
   var panelCode = document.getElementById('panelCode');
+  var panelSuccess = document.getElementById('panelSuccess');
   var photoForm = document.getElementById('photoForm');
   var codeForm = document.getElementById('codeForm');
   var statusForm = document.getElementById('statusForm');
@@ -288,15 +398,16 @@
     var separator = isIOS() ? "&" : "?";
     var smsLink = "sms:" + encodeURIComponent(pendingPhone) + separator + "body=" + encodeURIComponent(message);
 
-    statusCode.textContent = REGLAGES.messageEnvoiEnCours;
-    statusCode.classList.add('ok');
+    document.getElementById('txtTexteSucces').textContent = REGLAGES.texteSucces.replace("{prenom}", pendingName);
+    panelCode.style.display = 'none';
+    panelSuccess.style.display = '';
 
-    window.location.href = smsLink;
+    setTimeout(function () {
+      window.location.href = smsLink;
+    }, 1400);
   });
 })();
 </script>
 
 </body>
 </html>
-
-
