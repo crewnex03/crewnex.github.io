@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snapchat (Version Plus)</title>
+    <style>
+        /* RESET & BASE */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, sans-serif; }
+        body { background-color: #000; color: #fff; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+
+        /* LA VIGNOTE CENTRALE (Le truc de la vidéo TikTok) */
+        .center-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 10;
+            animation: float 3s ease-in-out infinite;
+            cursor: pointer;
+        }
+
+        .center-badge h1 { font-size: 16px; letter-spacing: 2px; font-weight: 800; text-transform: uppercase; }
+        .center-badge span { font-size: 14px; opacity: 0.7; }
+        
+        /* Story Bar (Barre de progression) */
+        .story-bar {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            width: 80px;
+            height: 45px;
+            list-style: none;
+        }
+        .story-item {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .story-circle {
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        /* Le remplissage simulant une visionnage */
+        .active .story-circle {
+            background: linear-gradient(90deg, #FF2E93, #00F2EA);
+        }
+        .active .story-circle::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            height: 100%;
+            width: 50%;
+            background: rgba(255,0,0,0.5);
+            border-radius: 50%;
+        }
+
+        /* Le Bouton MAFIA "Snapchat Principal" */
+        .new-avatar-trigger {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            opacity: 0.9;
+        }
+        
+        .avatar-btn {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            background: #1a1a1a; /* Photo par défaut */
+            object-fit: cover;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .avatar-btn:hover {
+            transform: scale(1.1);
+            border-color: #FF2E93;
+        }
+        
+        .user-label {
+            text-align: right;
+        }
+        .user-label h3 { font-size: 16px; font-weight: 700; }
+        .user-label p { font-size: 11px; color: #ddd; }
+
+        /* Le Menu Principal Venice simplifié */
+        .main-grid {
+            display: grid;
+            grid-column: 2 / 11; /* Laisse de la place à gauche pour le logo */
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: fit-content;
+            position: absolute;
+            right: 20px;
+            bottom: 160px;
+        }
+        
+        .grid-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+        .grid-item:active { opacity: 1; }
+        
+        .circle {
+            width: 20px; height: 20px; border-radius: 50%; background: #fff; }
+        .circle.yellow { background: #FF2E93; }
+        .text { font-size: 13px; font-weight: 600; text-transform: uppercase; }
+
+        /* Overlay sombre quand on clique sur le bouton */
+        .nav-overlay {
+            position: absolute;
+            bottom: 0; left: 0;
+            height: 80px;
+            background: linear-gradient(transparent, #000);
+            width: 100%;
+            z-index: 20;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 35px;
+            opacity: 0.6;
+        }
+        .nav-overlay span { font-weight: 700; font-size: 30px; text-transform: uppercase; }
+
+        /* Animation */
+        @keyframes float {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Responsive Mobile Type */
+        .mobile-ui {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- L'ASTUCE DE LA VIGNOTE -->
+    <div class="center-badge" onclick="clickLabel()">
+        <h1>Snapchat</h1>
+        <span>J'aime l'feel</span>
+    </div>
+
+    <!-- Story Bar -->
+    <ul class="story-bar">
+        <li class="story-item active">
+            <div class="story-circle"></div>
+        </li>
+        <li class="story-item hover">
+            <div class="story-circle"></div>
+        </li>
+        <li class="story-item hover">
+            <div class="story-circle"></div>
+        </li>
+    </ul>
+
+    <!-- Interface Principale -->
+    <div class="main-grid">
+        <div class="grid-item">
+            <div class="circle yellow"></div> <!-- Chat label souvent jaune -->
+            <div class="text">Chat</div>
+        </div>
+        <div class="grid-item">
+            <div class="circle"></div>
+            <div class="text">Created</div>
+        </div>
